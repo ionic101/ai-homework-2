@@ -81,10 +81,33 @@ print(cm)
 
 ### 2.1 Кастомный Dataset класс (15 баллов)
 ```python
-# Создайте кастомный класс датасета для работы с CSV файлами:
-# - Загрузка данных из файла
-# - Предобработка (нормализация, кодирование категорий)
-# - Поддержка различных форматов данных (категориальные, числовые, бинарные и т.д.)
+class CustomDataset(Dataset):
+    def __init__(self, csv_path: str):
+        self.data = pd.read_csv(csv_path)
+
+    def normalize(self):
+        scaler = MinMaxScaler()
+        numeric_cols = self.data.select_dtypes(include=['number']).columns
+        self.data[numeric_cols] = scaler.fit_transform(self.data[numeric_cols])
+    
+    def fill_none(self):
+        self.data = self.data.fillna('NaN')
+    
+    def encode(self):
+        self.fill_none()
+        categorical_cols = self.data.select_dtypes(exclude=['number']).columns
+        for col in categorical_cols:
+            le = LabelEncoder()
+            self.data[col] = le.fit_transform(self.data[col])
+    
+    def __str__(self):
+        return str(self.data)
+    
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        return self.data.iloc[idx]
 ```
 
 ### 2.2 Эксперименты с различными датасетами (15 баллов)
