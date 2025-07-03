@@ -46,17 +46,7 @@ else:
 ### 1.2 Расширение логистической регрессии (15 баллов)
 Добавление поддержки многоклассовой классификации
 ```python
-class LogisticRegression(nn.Module):
-    def __init__(self, in_features, out_features):
-        super().__init__()
-        self.linear = nn.Linear(in_features, out_features)
-
-    def forward(self, x):
-        return self.linear(x)
-...
-# Вычисляем accuracy
-y_pred = torch.argmax(logits, dim=1)
-acc = (y_pred == batch_y).float().mean().item()
+None
 ```
 
 Реализация метрик: precision, recall, F1-score, ROC-AUC
