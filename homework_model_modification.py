@@ -165,5 +165,6 @@ def test_logistic_regression():
     #new_model.eval() 
 
 
-#test_linear_regression()
-test_logistic_regression()
+if __name__ == '__main__':
+    #test_linear_regression()
+    test_logistic_regression()
