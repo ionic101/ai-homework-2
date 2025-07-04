@@ -46,7 +46,36 @@ else:
 ### 1.2 Расширение логистической регрессии (15 баллов)
 Добавление поддержки многоклассовой классификации
 ```python
-None
+def make_classification_data(count_data=100, count_features: int = 1,
+        count_classes: int = 1, source='random') -> tuple[torch.Tensor, torch.Tensor]:
+    if source == 'random':
+        X, y = make_classification(
+            n_samples=count_data,
+            n_features=count_features,
+            n_informative=min(count_features, count_classes),
+            n_redundant=0,
+            n_classes=count_classes,
+            class_sep=2.0,
+            random_state=42
+        )
+        X = torch.tensor(X, dtype=torch.float32)
+        y = torch.tensor(y, dtype=torch.long)
+        return X, y
+    else:
+        raise ValueError('Unknown source')
+```
+```python
+# Настройки
+in_features = 5
+out_features = 3
+# Генерируем данные
+X, y = make_classification_data(count_data=200, count_features=in_features, count_classes=out_features)
+...
+criterion = nn.CrossEntropyLoss()
+...
+# Вычисляем accuracy
+y_pred = torch.argmax(logits, dim=1)
+acc = accuracy(y_pred, batch_y)
 ```
 
 Реализация метрик: precision, recall, F1-score, ROC-AUC

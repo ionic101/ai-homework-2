@@ -1,6 +1,8 @@
 import torch
 import numpy as np
 from torch.utils.data import Dataset
+from sklearn.datasets import make_classification
+
 
 class RegressionDataset(Dataset):
     def __init__(self, X, y):
@@ -39,19 +41,20 @@ def make_regression_data(n=100, noise=0.1, source='random'):
     else:
         raise ValueError('Unknown source')
 
-def make_classification_data(n=100, source='random'):
+def make_classification_data(count_data=100, count_features: int = 1,
+        count_classes: int = 1, source='random') -> tuple[torch.Tensor, torch.Tensor]:
     if source == 'random':
-        X = torch.rand(n, 2)
-        w = torch.tensor([2.0, -3.0])
-        b = 0.5
-        logits = X @ w + b
-        y = (logits > 0).float().unsqueeze(1)
-        return X, y
-    elif source == 'breast_cancer':
-        from sklearn.datasets import load_breast_cancer
-        data = load_breast_cancer()
-        X = torch.tensor(data['data'], dtype=torch.float32)  # type: ignore
-        y = torch.tensor(data['target'], dtype=torch.float32).unsqueeze(1)  # type: ignore
+        X, y = make_classification(
+            n_samples=count_data,
+            n_features=count_features,
+            n_informative=min(count_features, count_classes),
+            n_redundant=0,
+            n_classes=count_classes,
+            class_sep=2.0,
+            random_state=42
+        )
+        X = torch.tensor(X, dtype=torch.float32)
+        y = torch.tensor(y, dtype=torch.long)
         return X, y
     else:
         raise ValueError('Unknown source')
@@ -60,8 +63,7 @@ def mse(y_pred, y_true):
     return ((y_pred - y_true) ** 2).mean().item()
 
 def accuracy(y_pred, y_true):
-    y_pred_bin = (y_pred > 0.5).float()
-    return (y_pred_bin == y_true).float().mean().item()
+    return (y_pred == y_true).float().mean().item()
 
 def log_epoch(epoch, loss, **metrics):
     msg = f"Epoch {epoch}: loss={loss:.4f}"

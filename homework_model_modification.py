@@ -15,9 +15,9 @@ class LinearRegression(nn.Module):
 
 
 class LogisticRegression(nn.Module):
-    def __init__(self, in_features):
+    def __init__(self, in_features, out_features):
         super().__init__()
-        self.linear = nn.Linear(in_features, 1)
+        self.linear = nn.Linear(in_features, out_features)
 
     def forward(self, x):
         return self.linear(x)
@@ -100,9 +100,13 @@ def test_linear_regression():
 
 
 def test_logistic_regression():
+    # Настройки
+    in_features = 5
+    out_features = 3
+
     # Генерируем данные
-    X, y = make_classification_data(n=200)
-    
+    X, y = make_classification_data(count_data=200, count_features=in_features, count_classes=out_features)
+
     # Создаём датасет и даталоадер
     dataset = ClassificationDataset(X, y)
     dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
@@ -114,12 +118,12 @@ def test_logistic_regression():
     all_y_true = []
     
     # Создаём модель, функцию потерь и оптимизатор
-    model = LogisticRegression(in_features=2)
-    criterion = nn.BCEWithLogitsLoss()
-    optimizer = optim.SGD(model.parameters(), lr=0.1)
+    model = LogisticRegression(in_features=in_features, out_features=out_features)
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.SGD(model.parameters(), lr=0.01)
     
     # Обучаем модель
-    epochs = 100
+    epochs = 300
     for epoch in range(1, epochs + 1):
         total_loss = 0
         total_acc = 0
@@ -132,7 +136,7 @@ def test_logistic_regression():
             optimizer.step()
             
             # Вычисляем accuracy
-            y_pred = torch.sigmoid(logits) >= 0.5
+            y_pred = torch.argmax(logits, dim=1)
             acc = accuracy(y_pred, batch_y)
 
             # Сохраняем значения для создания confusion matrix
@@ -153,12 +157,12 @@ def test_logistic_regression():
     print(cm)
     
     # Сохраняем модель
-    torch.save(model.state_dict(), 'logreg_torch.pth')
+    torch.save(model.state_dict(), 'models/logreg_torch.pth')
     
     # Загружаем модель
-    new_model = LogisticRegression(in_features=2)
-    new_model.load_state_dict(torch.load('logreg_torch.pth'))
-    new_model.eval() 
+    #new_model = LogisticRegression(in_features=in_features, out_features=out_features)
+    #new_model.load_state_dict(torch.load('logreg_torch.pth'))
+    #new_model.eval() 
 
 
 #test_linear_regression()
