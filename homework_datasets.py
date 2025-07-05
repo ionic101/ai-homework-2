@@ -10,6 +10,7 @@ from utils import make_regression_data, log_epoch, RegressionDataset, make_class
 from sklearn.metrics import confusion_matrix
 from homework_model_modification import LinearRegression, LogisticRegression
 
+
 class CustomDataset(Dataset):
     def __init__(self, csv_path: str):
         self.data = pd.read_csv(csv_path)
